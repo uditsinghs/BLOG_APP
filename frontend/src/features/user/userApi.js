@@ -18,3 +18,16 @@ export const logoutUser = async () => {
   const { data } = await axiosInstance.post("users/logout");
   return data;
 };
+
+export const updateBio = async ({ bio, userid }) => {
+  const { data } = await axiosInstance.put("/users/update", { bio, userid });
+  return data;
+};
+
+export const updateProfilePhoto = async (formData) => {
+  const { data } = await axiosInstance.put("/users/update/photo", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+

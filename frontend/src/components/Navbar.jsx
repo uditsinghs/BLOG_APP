@@ -12,7 +12,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -20,8 +19,6 @@ import {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated } = useSelector((state) => state.user);
-  console.log(user);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,52 +49,65 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Nav */}
-
-        {/* Normal user navlinks */}
         <nav className="hidden md:flex space-x-6 items-center">
-          <NavLink to="/" className={navLinkClass}>
-            Home
-          </NavLink>
-          <NavLink to="/blogs" className={navLinkClass}>
-            Blogs
-          </NavLink>
+          {/* For author and user show Home and Blogs links */}
+          {(user?.role === "author" || user?.role === "user") && (
+            <>
+              <NavLink to="/" className={navLinkClass}>
+                Home
+              </NavLink>
+              <NavLink to="/blogs" className={navLinkClass}>
+                Blogs
+              </NavLink>
+            </>
+          )}
 
-          {/* Author Navlinks */}
+          {/* Author Dropdown */}
+          {user?.role === "author" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="font-bold">
+                {user?.name}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <NavLink to="/author" className={navLinkClass}>
+                    Dashboard
+                  </NavLink>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <NavLink to="/profile" className={navLinkClass}>
+                    Profile
+                  </NavLink>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
-          <DropdownMenu>
-            <DropdownMenuTrigger className="font-bold">
-              {user?.name}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuSeparator />
-              {user?.role === "author" && (
-                <>
-                  <DropdownMenuItem>
-                    <NavLink to="/author" className={navLinkClass}>
-                      Dashboard
-                    </NavLink>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <NavLink to="/profile" className={navLinkClass}>
-                      Profile
-                    </NavLink>
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Admin just show logout button */}
+          {user?.role === "admin" && (
+            <button
+              onClick={() => mutation.mutate()}
+              disabled={mutation.isLoading}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1"
+            >
+              <LogOut size={18} /> Logout
+            </button>
+          )}
 
-          {isAuthenticated && user ? (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => mutation.mutate()}
-                disabled={mutation.isLoading}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1"
-              >
-                <LogOut size={18} />
-              </button>
-            </div>
-          ) : (
+          {/* For author and user show logout button */}
+          {(user?.role === "author" || user?.role === "user") && (
+            <button
+              onClick={() => mutation.mutate()}
+              disabled={mutation.isLoading}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1"
+            >
+              <LogOut size={18} /> Logout
+            </button>
+          )}
+
+          {/* If not authenticated, show login */}
+          {!isAuthenticated && (
             <NavLink to="/login" className={navLinkClass}>
               Login
             </NavLink>
@@ -114,20 +124,27 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="left">
               <nav className="flex flex-col gap-4 mt-6 ml-14 text-xl">
-                <NavLink
-                  to="/"
-                  onClick={() => setIsOpen(false)}
-                  className={navLinkClass}
-                >
-                  Home
-                </NavLink>
-                <NavLink
-                  to="/blogs"
-                  onClick={() => setIsOpen(false)}
-                  className={navLinkClass}
-                >
-                  Blogs
-                </NavLink>
+                {/* Common Links */}
+                {(user?.role === "author" || user?.role === "user") && (
+                  <>
+                    <NavLink
+                      to="/"
+                      onClick={() => setIsOpen(false)}
+                      className={navLinkClass}
+                    >
+                      Home
+                    </NavLink>
+                    <NavLink
+                      to="/blogs"
+                      onClick={() => setIsOpen(false)}
+                      className={navLinkClass}
+                    >
+                      Blogs
+                    </NavLink>
+                  </>
+                )}
+
+                {/* Author specific links */}
                 {user?.role === "author" && (
                   <>
                     <NavLink
@@ -146,15 +163,37 @@ const Navbar = () => {
                     </NavLink>
                   </>
                 )}
-                {isAuthenticated && user ? (
+
+                {/* Admin logout button */}
+                {user?.role === "admin" && (
                   <button
-                    onClick={() => mutation.mutate()}
+                    onClick={() => {
+                      mutation.mutate();
+                      setIsOpen(false);
+                    }}
                     disabled={mutation.isLoading}
                     className="text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1"
                   >
                     <LogOut size={18} /> Logout
                   </button>
-                ) : (
+                )}
+
+                {/* Author and user logout button */}
+                {(user?.role === "author" || user?.role === "user") && (
+                  <button
+                    onClick={() => {
+                      mutation.mutate();
+                      setIsOpen(false);
+                    }}
+                    disabled={mutation.isLoading}
+                    className="text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1"
+                  >
+                    <LogOut size={18} /> Logout
+                  </button>
+                )}
+
+                {/* If not authenticated */}
+                {!isAuthenticated && (
                   <NavLink
                     to="/login"
                     onClick={() => setIsOpen(false)}

@@ -67,20 +67,21 @@ const App = () => {
             { path: "blog/create", element: <CreateBlog /> },
           ],
         },
+        {
+          path: "/admin",
+          element: (
+            <ProtectedRoute
+              isAllowed={isAuthenticated && user?.role === "admin"}
+              redirectTo="/"
+            >
+              <AdminLayout />
+            </ProtectedRoute>
+          ),
+          children: [{ index: true, element: <AdminDashboard /> }],
+        },
       ],
     },
-    {
-      path: "/admin",
-      element: (
-        <ProtectedRoute
-          isAllowed={isAuthenticated && user?.role === "admin"}
-          redirectTo="/"
-        >
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [{ index: true, element: <AdminDashboard /> }],
-    },
+
     {
       path: "/login",
       element: <Login />,

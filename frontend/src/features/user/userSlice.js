@@ -30,6 +30,12 @@ export const userSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload;
 
+    },
+    updateUserBio: (state, action) => {
+      state.user = state.user.bio = action.payload;
+    },
+    updateUserPhoto: (state, action) => {
+      state.user = state.user.photo = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -50,7 +56,7 @@ export const userSlice = createSlice({
   },
 })
 
-export const { login, logout, setUser } = userSlice.actions;
+export const { login, logout, setUser, updateUserBio, updateUserPhoto } = userSlice.actions;
 export default userSlice.reducer;
 
 
